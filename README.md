@@ -1,22 +1,22 @@
 # Sales Commission Tracker
 
-A web application for tracking and managing sales commissions with Salesforce integration, automated PDF generation, and email distribution.
+A web application for tracking and managing sales commissions with simplified PDF upload from Salesforce.
 
 ## Overview
 
-This commission tracking tool helps manage sales team commissions by:
+This commission tracking tool assists in managing sales team commissions by:
 - Importing year-to-date opportunities via CSV
-- Connecting to Salesforce to fetch closed/won deals
+- Uploading PDFs from Salesforce directly
 - Calculating commissions based on deal types (renewal, expansion, new business)
-- Generating monthly commission statements as PDFs
-- Automatically emailing commission reports to sales representatives
+- Generating monthly commission reports
+- Making reports available for download to sales representatives
 
 ## Features
 
 ### 🎯 Core Functionality
-- **Employee Selection**: Dropdown list to select sales representatives
-- **Deal Tracking**: Automatic import of closed/won deals from Salesforce for the current month
-- **Running Totals**: Month-over-month commission tracking with cumulative views
+- **Employee Selection**: Dropdown to select sales representative
+- **Deal Tracking**: Import closed/won deals manually via PDFs from Salesforce
+- **Running Totals**: Maintain month-over-month commission tracking
 - **CSV Import**: Bulk import of year-to-date opportunities
 - **Flexible Payout Rules**: Configure commission percentages by deal type:
   - New Business
@@ -24,22 +24,22 @@ This commission tracking tool helps manage sales team commissions by:
   - Renewal
 
 ### 📊 Commission Calculations
-- Customizable payout percentages per deal type
+- Customize payout percentages per deal type
 - Real-time commission calculations
 - Monthly and YTD totals
 - Deal-level breakdown visibility
 
-### 📄 Reporting & Distribution
-- Generate PDF commission statements per sales rep
-- Automated email delivery of monthly commission files
-- Professional PDF formatting with company branding
+### 📄 Reporting
+- Generate monthly commission statements for sales reps
+- Provide download links for monthly commission files
+- Ensure professional PDF formatting with company branding
 
 ## Tech Stack
 
 - **Framework**: Next.js 14+ (App Router)
 - **Database**: PostgreSQL (via Vercel Postgres or Supabase)
 - **Authentication**: NextAuth.js
-- **Salesforce Integration**: JSforce or Salesforce REST API
+- **Salesforce Integration**: PDF upload
 - **PDF Generation**: jsPDF or Puppeteer
 - **Email**: Resend, SendGrid, or Nodemailer
 - **Deployment**: Vercel
@@ -59,12 +59,6 @@ Create a `.env.local` file with the following variables:
 ```bash
 # Database
 DATABASE_URL=postgresql://...
-
-# Salesforce
-SALESFORCE_CLIENT_ID=your_client_id
-SALESFORCE_CLIENT_SECRET=your_client_secret
-SALESFORCE_REDIRECT_URI=https://your-domain.com/api/auth/salesforce/callback
-SALESFORCE_LOGIN_URL=https://login.salesforce.com
 
 # Email Service (example with Resend)
 RESEND_API_KEY=your_resend_api_key
@@ -163,12 +157,22 @@ john@company.com,Acme Corp - New,50000,new_business,2024-01-15,006abc123
 jane@company.com,TechCo Expansion,25000,expansion,2024-02-20,006def456
 ```
 
-### 3. Connect to Salesforce
+### 3. Upload Salesforce PDF
 
-Authenticate with Salesforce to enable automatic syncing of closed/won deals. The app will:
-- Fetch new closed/won opportunities daily
-- Match opportunities to employees by Salesforce user ID
-- Automatically calculate commissions based on configured rules
+Download the opportunity report as a PDF from Salesforce and upload it:
+
+1. In Salesforce, go to your Opportunities report
+2. Filter to show "Closed Won" deals for the desired month
+3. Click "Printable View" and save as PDF
+4. Upload the PDF in the Commission Tracker app
+5. The app will parse and extract:
+   - Opportunity Name
+   - Account Name
+   - Amount (Annual Recurring Revenue)
+   - Close Date
+   - Stage
+   - Owner Full Name
+   - Type (New Business, Expansion, Renewal)
 
 ### 4. View Commissions
 
@@ -177,29 +181,28 @@ Authenticate with Salesforce to enable automatic syncing of closed/won deals. Th
 - See running totals month-over-month
 - Review individual deal contributions
 
-### 5. Generate & Send Reports
+### 5. Generate Reports
 
 Generate monthly commission statements:
 - Click "Generate PDF" for a specific employee and month
 - PDF includes deal breakdown, commission calculations, and totals
-- Click "Email Statement" to send the PDF to the sales rep
+- Provide download link to the sales rep
 
 Or use bulk processing:
 - Navigate to "Monthly Close"
 - Select the month and click "Process All"
-- Generates PDFs and emails for all active employees
+- Generates PDFs for all active employees
 
 ## API Endpoints
 
 ### Opportunities
 - `GET /api/opportunities?employee_id={id}&month={YYYY-MM}` - Get opportunities
-- `POST /api/opportunities/import` - Import CSV
-- `POST /api/opportunities/sync` - Sync from Salesforce
+- `POST /api/opportunities/import-csv` - Import CSV
+- `POST /api/opportunities/import-pdf` - Import Salesforce PDF
 
 ### Commissions
 - `GET /api/commissions?employee_id={id}&month={YYYY-MM}` - Calculate commissions
 - `POST /api/commissions/generate-pdf` - Generate PDF statement
-- `POST /api/commissions/send-email` - Email statement
 
 ### Settings
 - `GET /api/commission-rules` - Get commission rules
@@ -228,20 +231,14 @@ vercel
 
 1. Add environment variables in Vercel dashboard
 2. Update `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to your Vercel domain
-3. Update Salesforce OAuth redirect URI to match your Vercel domain
-4. Configure email service with your production domain
+3. Configure email service with your production domain
 
 ## Scheduled Tasks
 
 Set up cron jobs or Vercel Cron to:
 
-**Daily Sync** (Every day at 6 AM UTC):
-- Sync closed/won opportunities from Salesforce
-- File: `/api/cron/sync-salesforce`
-
 **Monthly Close** (1st of each month at 8 AM UTC):
 - Generate PDFs for all employees for the previous month
-- Email commission statements to each rep
 - File: `/api/cron/monthly-close`
 
 Configure in `vercel.json`:
@@ -249,10 +246,6 @@ Configure in `vercel.json`:
 ```json
 {
   "crons": [
-    {
-      "path": "/api/cron/sync-salesforce",
-      "schedule": "0 6 * * *"
-    },
     {
       "path": "/api/cron/monthly-close",
       "schedule": "0 8 1 * *"
@@ -282,7 +275,7 @@ npm run build
 
 ## Security Considerations
 
-- All Salesforce credentials stored as environment variables
+- PDF uploads validated for file type and size
 - Employee access restricted via authentication
 - Commission rules require admin privileges to modify
 - Email sending rate-limited to prevent abuse
@@ -291,10 +284,10 @@ npm run build
 
 ## Troubleshooting
 
-### Salesforce Connection Issues
-- Verify OAuth credentials are correct
-- Ensure redirect URI matches exactly (including https/http)
-- Check Salesforce API limits haven't been exceeded
+### PDF Upload Issues
+- Verify PDF is from Salesforce with the expected format
+- Check that the PDF contains a proper data table
+- Ensure PDF file size is under 10MB
 
 ### PDF Generation Failures
 - Increase Vercel function timeout if needed
