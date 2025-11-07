@@ -316,3 +316,33 @@ For questions or issues, please open an issue on GitHub or contact the developme
 ## License
 
 MIT
+
+## Commission Statement Template
+
+The commission statement template displayed when selecting a sales representative follows a comprehensive Excel-based format. See [TEMPLATE_SPEC.md](./TEMPLATE_SPEC.md) for complete details.
+
+### Template Sections
+
+1. **Employee Information Header**
+   - Payee name, year, compensation plan
+   - Base salary, commission target, BCR, OTE
+   - Quarterly and annual quotas
+
+2. **Commission Tier Rates**
+   - Achievement-based tiers (1x, 1.5x, 2x multipliers)
+   - Multi-year rate bonuses
+   - Renewal flat rates
+
+3. **Monthly Performance Tracking**
+   - Period, quota, credit (new ARR)
+   - Year-to-date totals and attainment percentage
+
+4. **Commission Payout Schedule**
+   - Period earned vs. period paid
+   - Draw, held, commission, and SPIFF payments
+   - Running totals and notes
+
+5. **Definitions**
+   - Terms glossary (Draw, Held, SPIFF)
+
+The template maintains month-over-month running totals and provides complete transparency into commission calculations, holds, and payments.
