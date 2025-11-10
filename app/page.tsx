@@ -62,6 +62,12 @@ export default function Home() {
             </p>
             <div className="flex gap-4 justify-center">
               <a
+                href="/upload"
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                📤 Upload Data
+              </a>
+              <a
                 href="https://github.com/ddecoen/commissions"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -73,9 +79,9 @@ export default function Home() {
                 href="https://github.com/ddecoen/commissions/blob/main/README.md"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
               >
-                Read Documentation
+                Documentation
               </a>
             </div>
           </div>
